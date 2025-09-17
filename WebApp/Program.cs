@@ -2,6 +2,7 @@ using System.Text;
 using Domain.Entities;
 using Infrastructure.Data.DataContext;
 using Infrastructure.Data.Seeder;
+using Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -106,6 +107,14 @@ using (var scope = app.Services.CreateScope())
         //
     }
 }
+
+
+var res = GenerateRandomPasswordHelper.GeneratePassword();
+Console.WriteLine("My password : " + res);
+
+
+
+
 
 
 app.Run();
