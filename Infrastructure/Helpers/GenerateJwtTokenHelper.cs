@@ -5,20 +5,18 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-
 namespace Infrastructure.Helpers;
 
 public static class GenerateJwtTokenHelper
 {
-    private static readonly IConfiguration configuration;
-    private static readonly RoleManager<IdentityRole>  roleManager;
-    private static string GenerateJwtToken(User user)
+    
+    public static async Task<string> GenerateJwtToken(User user,UserManager<User> userManager,IConfiguration configuration)
     {
-        var jwtSection = configuration.GetSection("JWT");
-        var issuer = jwtSection["Issuer"];
-        var audience = jwtSection["Audience"];
-        var secret = jwtSection["Key"];
-        var expiresDay = int.TryParse(jwtSection["ExpiresDay"], out var m) ? m : 3;
+        var jwtSection =  configuration.GetSection("JWT"); 
+        var issuer = jwtSection.GetValue<string>("Issuer");
+        var audience =  jwtSection.GetValue<string>("Audience");
+        var secret = jwtSection.GetValue<string>("Key");
+        var expiresDay = 3;
 
         var claims = new List<Claim>
         {
@@ -28,12 +26,14 @@ public static class GenerateJwtTokenHelper
             new(JwtRegisteredClaimNames.Email, user.Email),
             new (JwtRegisteredClaimNames.PhoneNumber,user.PhoneNumber)
         };
-        var roles = roleManager.Roles.ToList();
-        foreach (var r in roles)
+
+        var roles = await userManager.GetRolesAsync(user);
+        foreach (var role in roles)
         {
-            claims.Add(new Claim("role", r.Name));
+            claims.Add(new Claim("role", role));
         }
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret!));
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expires = DateTime.UtcNow.AddDays(expiresDay);
 
