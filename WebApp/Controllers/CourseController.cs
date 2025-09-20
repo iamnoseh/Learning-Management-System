@@ -45,7 +45,7 @@ public class CourseController(ICourseService service) : Controller
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> GetCourses(CourseFilter filter)
+    public async Task<IActionResult> GetCourses([FromQuery] CourseFilter filter)
     {
         var res = await service.GetCourses(filter);
         return Ok(res);

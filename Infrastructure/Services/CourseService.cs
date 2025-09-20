@@ -6,6 +6,7 @@ using Domain.Responces;
 using Infrastructure.Data.DataContext;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Infrastructure.Services;
 
@@ -15,6 +16,7 @@ public class CourseService(DataContext context) : ICourseService
     {
         try
         {
+            Log.Information("Creating new Course");
             var newCourse = new Course
             {
                 Title = dto.Title,
@@ -29,12 +31,21 @@ public class CourseService(DataContext context) : ICourseService
             };
            await context.Courses.AddAsync(newCourse);
            var res = await context.SaveChangesAsync();
+           if (res > 0)
+           {
+               Log.Information("Course Created");
+           }
+           else
+           {
+               Log.Fatal("Course could not be created");
+           }
            return res > 0 
                ? new Response<string>(HttpStatusCode.Created,"Course created")
                : new Response<string>(HttpStatusCode.BadRequest,"Course not created");
         }
         catch (Exception e)
         {
+            Log.Error("Error in CreateCourse");
             return new Response<string>(HttpStatusCode.InternalServerError,e.Message);
         }
     }
@@ -43,6 +54,7 @@ public class CourseService(DataContext context) : ICourseService
     {
         try
         {
+            Log.Information("Updating Course");
             var updatedCourse = await context.Courses.FirstOrDefaultAsync(x=>x.Id == dto.Id);
             if(updatedCourse == null) return new Response<string>(HttpStatusCode.NotFound,"Course not found");
             updatedCourse.Title = dto.Title;
@@ -52,12 +64,21 @@ public class CourseService(DataContext context) : ICourseService
             updatedCourse.IsFree = dto.IsFree;
             updatedCourse.UpdatedAt = DateTime.UtcNow;
             var res = await context.SaveChangesAsync();
+            if (res > 0)
+            {
+                Log.Information("Course Updated");
+            }
+            else
+            {
+                Log.Fatal("Course could not be updated");
+            }
             return res > 0
                 ? new Response<string>(HttpStatusCode.OK,"Course updated")
                 : new Response<string>(HttpStatusCode.NotFound,"Course not updated");
         }
         catch (Exception e)
         {
+            Log.Error("Error in UpdateCourse");
             return new Response<string>(HttpStatusCode.InternalServerError,e.Message);
         }
     }
@@ -66,16 +87,26 @@ public class CourseService(DataContext context) : ICourseService
     {
         try
         {
+            Log.Information("Deleting Course");
             var deletedCourse = await context.Courses.FirstOrDefaultAsync(x => x.Id == id);
             if(deletedCourse == null) return new Response<string>(HttpStatusCode.NotFound,"Course not found");
             deletedCourse.IsDeleted = true;
             var res = await context.SaveChangesAsync();
+            if (res > 0)
+            {
+                Log.Information("Course Deleted");
+            }
+            else
+            {
+                Log.Fatal("Course could not be deleted");
+            }
             return res > 0
                 ? new Response<string>(HttpStatusCode.OK,"Course deleted")
                 : new Response<string>(HttpStatusCode.NotFound,"Course not deleted");
         }
         catch (Exception e)
         {
+            Log.Error("Error in DeleteCourse");
             return new Response<string>(HttpStatusCode.InternalServerError,e.Message);
         }
     }
@@ -84,6 +115,7 @@ public class CourseService(DataContext context) : ICourseService
     {
         try
         {
+            Log.Information("Getting Course");
              var getCourse = await context.Courses.FirstOrDefaultAsync(x => x.Id == id && x.IsDeleted == false);
              if(getCourse == null) return new Response<GetCourseDto>(HttpStatusCode.NotFound,"Course not found");
              var dto = new GetCourseDto()
@@ -102,6 +134,7 @@ public class CourseService(DataContext context) : ICourseService
         }
         catch (Exception e)
         {
+            Log.Error("Error in GetCourseById");
             return new Response<GetCourseDto>(HttpStatusCode.InternalServerError,e.Message);
         }
     }
@@ -110,6 +143,7 @@ public class CourseService(DataContext context) : ICourseService
     {
         try
         {
+            Log.Information("Getting Courses");
             var query = context.Courses.AsQueryable();
             if (filter.Id.HasValue)
             {
@@ -167,6 +201,7 @@ public class CourseService(DataContext context) : ICourseService
         }
         catch (Exception e)
         {
+            Log.Error("Error in GetCourses");
             return new PaginationResponse<List<GetCourseDto>>(HttpStatusCode.InternalServerError,e.Message);
         }
     }
