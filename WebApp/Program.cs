@@ -17,6 +17,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
 builder.Services.AddScoped<DataContext>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services
