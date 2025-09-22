@@ -5,6 +5,7 @@ using Infrastructure.Data.Seeder;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Domain.Dtos.Email;
 using Infrastructure.Interfaces;
+using Infrastructure.Profiles;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,8 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAutoMapper(typeof(AppProfile));
 
 builder.Services.AddScoped<DataContext>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
