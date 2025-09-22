@@ -19,4 +19,10 @@ public class User : IdentityUser<int>
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; }  = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public ICollection<Course> CoursesCreated { get; set; } = new List<Course>();
+    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+    public ICollection<DiscussionPost> DiscussionPosts { get; set; } = new List<DiscussionPost>();
+    public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
+    public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 }

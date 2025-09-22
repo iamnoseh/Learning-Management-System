@@ -2,10 +2,10 @@ using System.Text;
 using Domain.Entities;
 using Infrastructure.Data.DataContext;
 using Infrastructure.Data.Seeder;
-using Infrastructure.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Domain.Dtos.Email;
 using Infrastructure.Interfaces;
+using Infrastructure.Profiles;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +18,11 @@ builder.Services.AddScoped<DataContext>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAutoMapper(typeof(AppProfile));
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services
     .AddIdentityCore<User>(opt =>
